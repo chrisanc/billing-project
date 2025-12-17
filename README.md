@@ -1,4 +1,4 @@
-# ** 💰 Billing filler project**
+# **💰 Billing filler project**
 **Stack:** Python
 
 ## **What´s this project about?**
