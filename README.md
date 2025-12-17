@@ -1,4 +1,4 @@
-# **Billing filler project**
+# ** 💰 Billing filler project**
 **Stack:** Python
 
 ## **What´s this project about?**
@@ -12,11 +12,11 @@ This two things are the heart of the system and they should be in the right form
 
 When you run the program and you provide it the two arguments, it will modify the Excel file in place with the whole data in it, making the process faster than filling it manually.
 
-## Manual filling vs this project:
+## ✍️ Manual filling vs this project:
 If you filled a billing manually, it would take you about 40-50 minutes to finish and you could make mistakes with the calculations but, if you use this system, it takes you about 2-3 minutes
 and it won´t make any mistake because the data is managed in a very precise way.
 
-## Libraries needed
+## 📖 Libraries needed
 To be able to run this project, you must install the next dependencies:
 
 ```cmd
