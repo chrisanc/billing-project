@@ -24,7 +24,7 @@ class BillingParser:
         Entry Point: Executes the file parsing and modifying.
         """
         # Parse and modify the generals sheet
-        #self.generals.parse(self.file_manager.open_sheet("GENERALES"), self.file_manager.load_worksheet("GENERALES"))
+        self.generals.parse(self.file_manager.open_sheet("GENERALES"), self.file_manager.load_worksheet("GENERALES"))
         # Parse and modify the totals sheet
         self.totals.parse(self.file_manager.open_sheet("TOTALES"), self.file_manager.load_worksheet("TOTALES"))
         # Save the changes to the original file

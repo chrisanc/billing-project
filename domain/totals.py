@@ -7,11 +7,11 @@ class TotalsParser:
     
     
     def parse(self, df: pd.DataFrame, ws):
-        totals, original = self.__parse_totals(df)
+        totals = self.__parse_totals(df)
         self.__modify_totals(totals, ws)
     
     
-    def __parse_totals(self, df: pd.DataFrame) -> tuple[list[pd.DataFrame], pd.DataFrame]:
+    def __parse_totals(self, df: pd.DataFrame) -> list[pd.DataFrame]:
         """
         Parse the sheets to modify it.
         """
@@ -28,7 +28,7 @@ class TotalsParser:
             chunk = chunk.iloc[1:]
             values.append(chunk)
         
-        return values, df
+        return values
     
     
     def __modify_totals(self, dfs: list[pd.DataFrame], ws):
@@ -36,7 +36,10 @@ class TotalsParser:
         for df in dfs:
             # Get the prices rows
             # First and last 3 ones are reserved, middle ones aren't.
-            prices_mn = df[df["SAMPLE_FORM"].str.endswith("M.N.", na=False)].copy()
+            prices_mn = df[
+                (df["SAMPLE_FORM"].str.endswith("M.N.", na=False)) |
+                (df["SAMPLE_FORM"] == "*")
+            ].copy()
             
             # STEP 1: Set the dollar price
             ws.cell(row=prices_mn.index[0] + 2, column=3, value=f"$ {self.__dollar_price:.4f} MN")
@@ -55,7 +58,11 @@ class TotalsParser:
                 ws.cell(row=row.Index + 2, column=4, value=row.SUBTOTAL)
             # Add the final subtotal (possible bug here, it's fragile)
             subtotal = round(subtotals["SUBTOTAL"].sum(), ndigits=4)
-            ws.cell(row=subtotals.iloc[-1].name + 3, column=4, value=subtotal)
+            ws.cell(
+                row=df[df["SAMPLE_FORM"].str.lower().str.strip() == "subtotal"].index[0] + 2,
+                column=4,
+                value=subtotal
+            )
             
             # STEP 3: Set the subtotals in US and MXN, as well as the totals
             totals = prices_mn[-3:].copy()
@@ -63,12 +70,11 @@ class TotalsParser:
             totals["MXN"] = [subtotal, round(subtotal * 0.16, ndigits=4), round(subtotal * 1.16, ndigits=4)]
             # USD convertions
             totals["USD"] = [
-                round(subtotal / self.__dollar_price),
-                round((subtotal / self.__dollar_price) * 0.16),
-                round((subtotal / self.__dollar_price) * 1.16)
+                round(subtotal / self.__dollar_price, ndigits=2),
+                round((subtotal / self.__dollar_price) * 0.16, ndigits=2),
+                round((subtotal / self.__dollar_price) * 1.16, ndigits=2)
             ]
             # Set the values
             for row in totals.itertuples():
                 ws.cell(row=row.Index + 2, column=3, value=f"{row.MXN:,} Pesos M.N.")
                 ws.cell(row=row.Index + 2, column=4, value=f"{row.USD:,.2f} US Dollar")
-            break
