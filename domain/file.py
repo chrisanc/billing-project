@@ -6,8 +6,8 @@ import pandas as pd
 File class: Used to manage the files in the system
 """
 class File:
-    def __init__(self):
-        self.file = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx")])
+    def __init__(self, file):
+        self.file = file
         self.workbook = self.load_workbook()
         
     def open_sheet(self, sheet_name: str):

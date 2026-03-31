@@ -1,10 +1,10 @@
 from .file import File
 from .generals import GeneralParser
 from .totals import TotalsParser
-import pandas as pd
+from io import BytesIO
 
 class BillingParser:
-    def __init__(self, dollar_price: float):
+    def __init__(self, dollar_price: float, file):
         # Current dollar price
         self.dollar_price = dollar_price
         # Code-Price relation (USD)
@@ -14,18 +14,24 @@ class BillingParser:
           'TFM-001': 80, 'TFM-003': 22, 'TFM-008': 32, 'TFM-009': 21, 'TFM-010': 38, 'TFM-011': 22, 'TFM-012': 495, 'TFM-013': 21,
           'TFM-014': 36, 'GIP-001': 3000 / self.dollar_price, 'CSS-001': 100, '003-GAP': 23, '021-LS6': 85, 'TFM-015': 160, 'TPA-015': 28}
         # Instanciate the file manager
-        self.file_manager = File()
+        self.file_manager = File(file)
         self.generals = GeneralParser(self.prices, self.dollar_price)
         self.totals = TotalsParser(self.prices, self.dollar_price)
         
         
-    def start(self):
+    def start(self) -> BytesIO:
         """
         Entry Point: Executes the file parsing and modifying.
+        Returns the in-memory Excel file to download
         """
         # Parse and modify the generals sheet
         self.generals.parse(self.file_manager.open_sheet("GENERALES"), self.file_manager.load_worksheet("GENERALES"))
         # Parse and modify the totals sheet
         self.totals.parse(self.file_manager.open_sheet("TOTALES"), self.file_manager.load_worksheet("TOTALES"))
-        # Save the changes to the original file
-        self.file_manager.workbook.save(self.file_manager.file)
+        # Save the changes to the in-memory buffer
+        output = BytesIO()
+        self.file_manager.workbook.save(output)
+        # Reset the file cursor (to download the whole Excel)
+        output.seek(0)
+        
+        return output
