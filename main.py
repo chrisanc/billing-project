@@ -1,5 +1,5 @@
 from domain.billing_parser import BillingParser
 
-parser = BillingParser(20.0102)
+parser = BillingParser(17.9218)
 
-parser.parse()
+parser.start()
